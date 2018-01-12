@@ -1,0 +1,22 @@
+{
+  "name": "log-pipeline",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "monitor": "nodemon ./bin/www",
+    "queueLogs": "node ./client/queueLogs.js"
+  },
+  "dependencies": {
+    "body-parser": "~1.18.2",
+    "date-and-time": "^0.6.2",
+    "debug": "^3.1.0",
+    "express": "^4.16.2",
+    "hbs": "^4.0.1",
+    "morgan": "~1.9.0",
+    "request": "^2.83.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.14.11"
+  }
+}
