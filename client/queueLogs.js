@@ -15,7 +15,7 @@ function postLogLine(lineNr) {
     let logEntry = clf2JSON(logLines[lineNr]);
     // An die Queue posten -- wir ignorieren Fehlermeldungen
     Request.post({
-        url: 'http://localhost:3000/queue/',
+        url: 'http://127.0.0.1:3000/queue/',
         json: { msg: logEntry }
     });
 

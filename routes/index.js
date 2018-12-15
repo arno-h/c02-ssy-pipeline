@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Log-Pipeline' });
+    res.send('Log-Pipeline');
 });
 
 module.exports = router;
