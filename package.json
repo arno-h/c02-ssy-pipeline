@@ -11,14 +11,14 @@
   },
   "dependencies": {
     "body-parser": "^1.19.0",
-    "date-and-time": "^0.11.0",
+    "date-and-time": "^0.11.1",
     "debug": "~4.1.1",
     "express": "^4.17.1",
     "lokijs": "^1.5.8",
-    "morgan": "^1.9.1",
-    "request": "^2.88.0"
+    "morgan": "^1.10.0",
+    "request": "^2.88.2"
   },
   "devDependencies": {
-    "nodemon": "^2.0.1"
+    "nodemon": "^2.0.3"
   }
 }
