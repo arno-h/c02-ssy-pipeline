@@ -1,4 +1,4 @@
-const Request = require('request');
+const axios = require('axios');
 const fs = require('fs');
 const date = require('date-and-time');
 
@@ -14,10 +14,7 @@ postLogLine(0);
 function postLogLine(lineNr) {
     let logEntry = clf2JSON(logLines[lineNr]);
     // An die Queue posten -- wir ignorieren Fehlermeldungen
-    Request.post({
-        url: 'http://127.0.0.1:3000/queue/',
-        json: { msg: logEntry }
-    });
+    axios.post('http://127.0.0.1:3000/queue/', { msg: logEntry }).then();
 
     // Solange wir noch Zeilen haben: mit Delay erneut aufrufen
     if (lineNr < logLines.length - 1) {

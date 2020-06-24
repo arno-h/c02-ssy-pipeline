@@ -1,7 +1,7 @@
-const Request = require('request');
+const axios = require('axios');
 
 
-function setup() {
+async function setup() {
 }
 
 module.exports = setup;
