@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const Axios = require('axios');
 const logic = require('./logic');
 
 router.post('/', newLogEntry);
@@ -29,21 +28,6 @@ function getTotalByteCount(req, res) {
         total_bytes: logic.totalByteCount
     };
     res.json(result);
-}
-
-// Initial delay, because server is still in setup phase
-setTimeout(pollQueue, 50);
-
-async function pollQueue() {
-    // repeat function every 800ms
-    setTimeout(pollQueue, 800);
-
-    const response = await Axios.delete("http://localhost:3000/queue/first");
-    if (response.status === 200) {
-        logic.increaseCount(response.data);
-    } else {
-        console.log("queue is empty");
-    }
 }
 
 module.exports = router;
