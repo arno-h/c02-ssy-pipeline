@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Axios = require('axios');
-
-let totalByteCount = 0;
+const logic = require('./logic');
 
 router.post('/', newLogEntry);
 /*
@@ -17,8 +16,7 @@ router.post('/', newLogEntry);
 }
 */
 function newLogEntry(req, res) {
-    const bytes = req.body.bytes;
-    totalByteCount += bytes;
+    logic.increaseCount(req.body);
     res.status(204); // empty response
     res.end();
 }
@@ -28,7 +26,7 @@ router.get('/', getTotalByteCount);
 
 function getTotalByteCount(req, res) {
     const result = {
-        total_bytes: totalByteCount
+        total_bytes: logic.totalByteCount
     };
     res.json(result);
 }
@@ -42,9 +40,7 @@ async function pollQueue() {
 
     const response = await Axios.delete("http://localhost:3000/queue/first");
     if (response.status === 200) {
-        const body = response.data;
-        const bytes = body.bytes;
-        totalByteCount += bytes;
+        logic.increaseCount(response.data);
     } else {
         console.log("queue is empty");
     }
