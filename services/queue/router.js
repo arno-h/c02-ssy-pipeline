@@ -15,8 +15,12 @@ function newMessage(req, res) {
 router.delete('/first', getMessage);
 
 function getMessage(req, res) {
-    const msg = queue.shift();
-    res.json(msg);
+    if (queue.length > 0) {
+        const msg = queue.shift();
+        res.json(msg);
+    } else {
+        res.status(204).end();
+    }
 }
 
 module.exports = router;

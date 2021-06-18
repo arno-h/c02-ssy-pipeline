@@ -37,13 +37,17 @@ function getTotalByteCount(req, res) {
 setTimeout(pollQueue, 50);
 
 async function pollQueue() {
-    // repeat function every 1000ms
-    setTimeout(pollQueue, 1000);
+    // repeat function every 800ms
+    setTimeout(pollQueue, 800);
 
     const response = await Axios.delete("http://localhost:3000/queue/first");
-    const body = response.data;
-    const bytes = body.bytes;
-    totalByteCount += bytes;
+    if (response.status === 200) {
+        const body = response.data;
+        const bytes = body.bytes;
+        totalByteCount += bytes;
+    } else {
+        console.log("queue is empty");
+    }
 }
 
 module.exports = router;
