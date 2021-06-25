@@ -5,7 +5,11 @@ function increaseCount(message) {
     totalByteCount += bytes;
 }
 
+function getByteCount() {
+    return totalByteCount;
+}
+
 module.exports = {
-    totalByteCount,
-    increaseCount
+    increaseCount,
+    getByteCount
 }

@@ -25,7 +25,7 @@ router.get('/', getTotalByteCount);
 
 function getTotalByteCount(req, res) {
     const result = {
-        total_bytes: logic.totalByteCount
+        total_bytes: logic.getByteCount()
     };
     res.json(result);
 }

@@ -1,5 +1,6 @@
 const Axios = require('axios');
 const axios = Axios.create({validateStatus: null});
+const logic = require('./logic');
 
 // initial call is done by init() function in init.js
 async function pollQueue() {
