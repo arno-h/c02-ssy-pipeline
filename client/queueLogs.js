@@ -4,7 +4,7 @@ const fs = require('fs');
 const date = require('date-and-time');
 
 // Default: 1 Eintrag pro Sekunde (1000ms)
-const postDelay = process.argv.length < 3 ? 1000 : Number(process.argv[2]);
+let postDelay = process.argv.length < 3 ? 1000 : Number(process.argv[2]);
 
 // Wir lesen die gesamte Log-Datei synchron ein und splitten sie gleich in ein Array von Zeilen auf
 const logLines = fs.readFileSync(__dirname + '/../example.log').toString().split('\n');
@@ -19,10 +19,12 @@ async function postLogLine(lineNr) {
     const resp = await axios.post('http://127.0.0.1:3000/queue/', logEntry);
     switch (resp.status) {
         case 204: // ok
+            postDelay = postDelay * 0.99;
             break;
         case 429: // too many requests
             console.log('Message #' + lineNr + ' not accepted (code 429)');
             setTimeout(postLogLine, 2500, lineNr);
+            postDelay = postDelay * 1.05;
             break;
         default:
             // should never happen
@@ -32,7 +34,8 @@ async function postLogLine(lineNr) {
 
     // Solange wir noch Zeilen haben: mit Delay erneut aufrufen
     if (lineNr < logLines.length - 1) {
-        setTimeout(function() { postLogLine(lineNr + 1)}, postDelay);
+        console.log("Current delay: " + postDelay);
+        setTimeout(postLogLine, postDelay, lineNr + 1);
     }
 }
 
