@@ -22,6 +22,7 @@ async function postLogLine(lineNr) {
             break;
         case 429: // too many requests
             console.log('Message #' + lineNr + ' not accepted (code 429)');
+            setTimeout(postLogLine, 2500, lineNr);
             break;
         default:
             // should never happen
