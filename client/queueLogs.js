@@ -18,27 +18,26 @@ async function queueLogLine(lineNr, retryCount) {
     const resp = await axios.post('http://127.0.0.1:3000/queue/', logEntry);
     switch (resp.status) {
         case 204: // ok
-            postDelay = postDelay * 0.99;
+            // Solange wir noch Zeilen haben: mit Delay erneut aufrufen
+            if (lineNr < logLines.length - 1) {
+                console.log("Current delay: " + postDelay);
+                setTimeout(queueLogLine, postDelay, lineNr + 1, 0);
+            }
+            postDelay = postDelay * 0.9;
             break;
         case 429: // too many requests
             console.log('Message #' + lineNr + ' not accepted (code 429)');
-            const retryDelay = 2500 * Math.pow(2, retryCount); // == 2 ^ retryCount ... exponential back off
+            const retryDelay = 500 * Math.pow(2, retryCount); // == 2 ^ retryCount ... exponential back off
             // retryCount = 0 --> 2^0 = 1 --> delay=2500
             // retryCount = 1 --> 2^1 = 2 --> delay=2500*2=5000
             // retryCount = 2 --> 2^2 = 4 --> delay=2500*4=10000
             // retryCount = 3 --> 2^3 = 8 --> delay=2500*8=20000
             setTimeout(queueLogLine, retryDelay, lineNr, retryCount + 1);
-            postDelay = postDelay * 1.05;
+            postDelay = postDelay * 1.35;
             break;
         default:
             // should never happen
             console.log("Unexpected status code " + resp.status);
             break;
-    }
-
-    // Solange wir noch Zeilen haben: mit Delay erneut aufrufen
-    if (lineNr < logLines.length - 1) {
-        console.log("Current delay: " + postDelay);
-        setTimeout(queueLogLine, postDelay, lineNr + 1, 0);
     }
 }
