@@ -10,9 +10,9 @@ let postDelay = process.argv.length < 3 ? 1000 : Number(process.argv[2]);
 const logLines = fs.readFileSync(__dirname + '/../example.log').toString().split('\n');
 
 // Start mit der ersten Zeile
-postLogLine(0);
+postLogLine(0, 0);
 
-async function postLogLine(lineNr) {
+async function postLogLine(lineNr, retryCount) {
     let logEntry = clf2JSON(logLines[lineNr]);
 
     // An die Queue posten
@@ -23,7 +23,12 @@ async function postLogLine(lineNr) {
             break;
         case 429: // too many requests
             console.log('Message #' + lineNr + ' not accepted (code 429)');
-            setTimeout(postLogLine, 2500, lineNr);
+            const retryDelay = 2500 * Math.pow(2, retryCount); // == 2 ^ retryCount ... exponential back off
+            // retryCount = 0 --> 2^0 = 1 --> delay=2500
+            // retryCount = 1 --> 2^1 = 2 --> delay=2500*2=5000
+            // retryCount = 2 --> 2^2 = 4 --> delay=2500*4=10000
+            // retryCount = 3 --> 2^3 = 8 --> delay=2500*8=20000
+            setTimeout(postLogLine, retryDelay, lineNr, retryCount + 1);
             postDelay = postDelay * 1.05;
             break;
         default:
@@ -35,7 +40,7 @@ async function postLogLine(lineNr) {
     // Solange wir noch Zeilen haben: mit Delay erneut aufrufen
     if (lineNr < logLines.length - 1) {
         console.log("Current delay: " + postDelay);
-        setTimeout(postLogLine, postDelay, lineNr + 1);
+        setTimeout(postLogLine, postDelay, lineNr + 1, 0);
     }
 }
 
