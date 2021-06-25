@@ -4,8 +4,8 @@ const logic = require('./logic');
 
 // initial call is done by init() function in init.js
 async function pollQueue() {
-    // repeat function every 800ms
-    setTimeout(pollQueue, 800);
+    // repeat function every 1400ms
+    setTimeout(pollQueue, 1400);
 
     const response = await axios.delete("http://localhost:3000/queue/first");
     if (response.status === 200) {

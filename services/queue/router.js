@@ -6,6 +6,11 @@ const queue = [];
 router.post('/', newMessage);
 
 function newMessage(req, res) {
+    if (queue.length > 5) {
+        res.status(429).end();  // too many requests
+        return;
+    }
+
     const msg = req.body;
     queue.push(msg);
     res.status(204); // empty response
