@@ -7,7 +7,13 @@ const byteCounterQueuePolling = require('./services/byte_counter/polling');
  * Sie kann dazu benützt werden, Services zu konfigurieren.
  */
 async function init() {
-    await byteCounterQueuePolling();
+    // await byteCounterQueuePolling();
+    await axios.post('http://localhost:3000/pubsub/subscribe',
+        {url: "http://localhost:3000/byte_counter/"}
+    );
+    await axios.post('http://localhost:3000/pubsub/subscribe',
+        {url: "http://localhost:3000/host_counter/"}
+    );
 }
 
 module.exports = init;
