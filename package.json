@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node ./bin/www",
     "monitor": "nodemon ./bin/www",
-    "queueLogs": "node ./client/queueLogs.js"
+    "queueLogs": "node ./client/queueLogs.js",
+    "pubLogs": "node ./client/pubLogs.js"
   },
   "dependencies": {
     "axios": "^0.21.1",

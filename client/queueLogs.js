@@ -1,19 +1,18 @@
 const Axios = require('axios');
 const axios = Axios.create({validateStatus: null});
-const fs = require('fs');
-const date = require('date-and-time');
+const logs = require('./logParser');
 
 // Default: 1 Eintrag pro Sekunde (1000ms)
 let postDelay = process.argv.length < 3 ? 1000 : Number(process.argv[2]);
 
 // Wir lesen die gesamte Log-Datei synchron ein und splitten sie gleich in ein Array von Zeilen auf
-const logLines = fs.readFileSync(__dirname + '/../example.log').toString().split('\n');
+const logLines = logs.load('../example.log');
 
 // Start mit der ersten Zeile
-postLogLine(0, 0);
+queueLogLine(0, 0);
 
-async function postLogLine(lineNr, retryCount) {
-    let logEntry = clf2JSON(logLines[lineNr]);
+async function queueLogLine(lineNr, retryCount) {
+    let logEntry = logs.clf2JSON(logLines[lineNr]);
 
     // An die Queue posten
     const resp = await axios.post('http://127.0.0.1:3000/queue/', logEntry);
@@ -28,7 +27,7 @@ async function postLogLine(lineNr, retryCount) {
             // retryCount = 1 --> 2^1 = 2 --> delay=2500*2=5000
             // retryCount = 2 --> 2^2 = 4 --> delay=2500*4=10000
             // retryCount = 3 --> 2^3 = 8 --> delay=2500*8=20000
-            setTimeout(postLogLine, retryDelay, lineNr, retryCount + 1);
+            setTimeout(queueLogLine, retryDelay, lineNr, retryCount + 1);
             postDelay = postDelay * 1.05;
             break;
         default:
@@ -40,26 +39,6 @@ async function postLogLine(lineNr, retryCount) {
     // Solange wir noch Zeilen haben: mit Delay erneut aufrufen
     if (lineNr < logLines.length - 1) {
         console.log("Current delay: " + postDelay);
-        setTimeout(postLogLine, postDelay, lineNr + 1, 0);
+        setTimeout(queueLogLine, postDelay, lineNr + 1, 0);
     }
-}
-
-/**
- * Einfacher Parser, um einen CLF-Log-Eintrag in JSON zu transformieren
- */
-function clf2JSON(line) {
-    const re = /([^ ]*) - - \[([^\]]*) \+\d+\] "([^"]*)" ([^ ]*) ([^ ]*) "([^"]*)" "([^"]*)"/;
-    const matches = line.match(re);
-    if (!matches) {
-        return {};
-    }
-    return {
-        host: matches[1],
-        date: date.parse(matches[2], 'DD/MMM/YYYY:HH:mm:ss'),
-        request: matches[3],
-        status: Number(matches[4]),
-        bytes: Number(matches[5]) || 0,
-        referrer: matches[6],
-        userAgent: matches[7]
-    };
 }
