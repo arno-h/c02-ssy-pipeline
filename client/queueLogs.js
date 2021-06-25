@@ -1,4 +1,5 @@
-const axios = require('axios');
+const Axios = require('axios');
+const axios = Axios.create({validateStatus: null});
 const fs = require('fs');
 const date = require('date-and-time');
 
@@ -11,10 +12,22 @@ const logLines = fs.readFileSync(__dirname + '/../example.log').toString().split
 // Start mit der ersten Zeile
 postLogLine(0);
 
-function postLogLine(lineNr) {
+async function postLogLine(lineNr) {
     let logEntry = clf2JSON(logLines[lineNr]);
-    // An die Queue posten -- wir ignorieren Fehlermeldungen
-    axios.post('http://127.0.0.1:3000/queue/', logEntry).then();
+
+    // An die Queue posten
+    const resp = await axios.post('http://127.0.0.1:3000/queue/', logEntry);
+    switch (resp.status) {
+        case 204: // ok
+            break;
+        case 429: // too many requests
+            console.log('Message #' + lineNr + ' not accepted (code 429)');
+            break;
+        default:
+            // should never happen
+            console.log("Unexpected status code " + resp.status);
+            break;
+    }
 
     // Solange wir noch Zeilen haben: mit Delay erneut aufrufen
     if (lineNr < logLines.length - 1) {
